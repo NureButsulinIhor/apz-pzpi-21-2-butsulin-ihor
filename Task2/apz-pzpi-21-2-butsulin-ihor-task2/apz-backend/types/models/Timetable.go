@@ -7,7 +7,7 @@ import (
 
 type Timetable struct {
 	gorm.Model
-	WorkerID  uint      `json:"worker_id"`
+	WorkerID  uint      `json:"workerID"`
 	StartTime time.Time `json:"startTime"`
 	EndTime   time.Time `json:"endTime"`
 }

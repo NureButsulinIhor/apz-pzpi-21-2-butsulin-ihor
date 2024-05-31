@@ -51,7 +51,7 @@ func (g GormStorage) GetUsersByType(usersType models.UserType) ([]models.User, e
 func (g GormStorage) UpdateUserData(user *models.User) error {
 	db := g.db
 
-	result := db.Model(&models.User{}).Updates(models.User{
+	result := db.Model(&models.User{Model: gorm.Model{ID: user.ID}}).Updates(models.User{
 		Model:   gorm.Model{ID: user.ID},
 		Email:   user.Email,
 		Name:    user.Name,

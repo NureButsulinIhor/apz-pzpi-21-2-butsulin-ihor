@@ -8,6 +8,14 @@ import (
 	"log/slog"
 )
 
+type ManagerGetter interface {
+	GetManagerByUserID(id uint) (*models.Manager, error)
+}
+
+type WarehouseGetter interface {
+	GetWarehouseBySlotID(id uint) (*models.Warehouse, error)
+}
+
 type Getter interface {
 	GetDevice(id uuid.UUID) (*models.Device, error)
 }
@@ -46,12 +54,7 @@ func Polling(weighingResult models.WeighingResult, cfg Configuration) (float64, 
 		return 0, errors.New("no device found")
 	}
 
-	if device.SlotID == nil {
-		l.Debug("device is not connected to slot")
-		return 0, nil
-	}
-
-	weighingResult.SlotID = *device.SlotID
+	weighingResult.SlotID = device.SlotID
 
 	l.Debug("adding weighing result to db")
 	err = cfg.Storage.SaveWeighingResult(weighingResult)
@@ -61,7 +64,7 @@ func Polling(weighingResult models.WeighingResult, cfg Configuration) (float64, 
 	}
 
 	l.Debug("getting slot from db")
-	slot, err := cfg.Storage.GetSlot(*device.SlotID)
+	slot, err := cfg.Storage.GetSlot(device.SlotID)
 	if err != nil {
 		l.Debug("err to get slot from db")
 		return 0, errors.New("internal error")

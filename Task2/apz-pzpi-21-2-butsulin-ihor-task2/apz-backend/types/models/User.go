@@ -12,10 +12,10 @@ const (
 
 type User struct {
 	gorm.Model
-	Email   string `json:"email" gorm:"unique"`
-	Name    string `json:"name"`
-	Picture string `json:"picture"`
-	Type    UserType
+	Email   string   `json:"email" gorm:"unique"`
+	Name    string   `json:"name"`
+	Picture string   `json:"picture"`
+	Type    UserType `json:"type"`
 }
 
 func NewUserFromClaims(claims map[string]interface{}) (user User, err error) {
@@ -25,11 +25,13 @@ func NewUserFromClaims(claims map[string]interface{}) (user User, err error) {
 		}
 	}()
 
-	id := uint(claims["id"].(float64))
+	idFloat, _ := claims["id"].(float64)
+	id := uint(idFloat)
 	email := claims["email"].(string)
 	name := claims["name"].(string)
 	picture := claims["picture"].(string)
-	userType := UserType(claims["type"].(string))
+	userTypeString, _ := claims["type"].(string)
+	userType := UserType(userTypeString)
 
 	return User{
 		Model:   gorm.Model{ID: id},
@@ -42,9 +44,10 @@ func NewUserFromClaims(claims map[string]interface{}) (user User, err error) {
 
 func (u User) GetClaims() map[string]interface{} {
 	return map[string]interface{}{
+		"id":      float64(u.ID),
 		"email":   u.Email,
 		"name":    u.Name,
 		"picture": u.Picture,
-		"type":    u.Type,
+		"type":    string(u.Type),
 	}
 }

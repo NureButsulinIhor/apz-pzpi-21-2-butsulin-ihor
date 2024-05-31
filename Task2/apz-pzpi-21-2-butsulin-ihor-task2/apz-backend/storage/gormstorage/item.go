@@ -18,18 +18,19 @@ func (g GormStorage) GetItem(id uint) (*models.Item, error) {
 	db := g.db
 
 	var item models.Item
-	result := db.Preload(clause.Associations).First(&item, id)
+	result := db.Model(&models.Item{}).Preload(clause.Associations).First(&item, id)
 
 	return &item, result.Error
 }
 
-func (g GormStorage) UpdateItem(itemID uint, name, description string) error {
+func (g GormStorage) UpdateItem(itemID uint, name, description string, weight float64) error {
 	db := g.db
 
-	result := db.Model(&models.Item{}).Updates(models.Item{
+	result := db.Model(&models.Item{Model: gorm.Model{ID: itemID}}).Updates(models.Item{
 		Model:       gorm.Model{ID: itemID},
 		Name:        name,
 		Description: description,
+		Weight:      weight,
 	})
 
 	return result.Error

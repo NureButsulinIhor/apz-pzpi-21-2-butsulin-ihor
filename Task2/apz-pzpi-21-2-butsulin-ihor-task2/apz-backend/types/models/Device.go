@@ -8,11 +8,11 @@ import (
 )
 
 type Device struct {
-	ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"id"`
+	ID        uuid.UUID `gorm:"type:uuid;primaryKey" json:"ID"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
-	SlotID    *uint          `json:"slot_id"`
+	SlotID    uint           `json:"slotID"`
 }
 
 func (d *Device) GetClaims() map[string]interface{} {

@@ -7,7 +7,7 @@ import (
 
 type WeighingResult struct {
 	gorm.Model
-	SlotID uint      `json:"slot_id"`
+	SlotID uint      `json:"slotID"`
 	Weight float64   `json:"weight"`
 	Time   time.Time `json:"time"`
 }

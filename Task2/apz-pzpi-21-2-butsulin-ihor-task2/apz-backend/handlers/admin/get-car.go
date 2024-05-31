@@ -8,11 +8,8 @@ import (
 	"github.com/go-chi/render"
 	"log/slog"
 	"net/http"
+	"strconv"
 )
-
-type GetCarRequestData struct {
-	CarID uint `json:"carID"`
-}
 
 func GetCar(logger *slog.Logger, storage car.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -21,20 +18,20 @@ func GetCar(logger *slog.Logger, storage car.Storage) http.HandlerFunc {
 			slog.String("requestId", middleware.GetReqID(r.Context())),
 		)
 
-		var requestBody GetCarRequestData
-		err := render.DecodeJSON(r.Body, &requestBody)
+		carIDStr := r.PathValue("carID")
+		carID, err := strconv.ParseUint(carIDStr, 10, 64)
 		if err != nil {
 			w.WriteHeader(400)
 			render.JSON(w, r, types.Response[any]{
 				Status: false,
-				Error:  "invalid request body",
+				Error:  "invalid request id",
 				Body:   nil,
 			})
-			l.Debug("err in decoding json")
+			l.Debug("invalid request id")
 			return
 		}
 
-		carModel, err := car.Get(requestBody.CarID,
+		carModel, err := car.Get(uint(carID),
 			car.Configuration{
 				Logger:  l,
 				Storage: storage,

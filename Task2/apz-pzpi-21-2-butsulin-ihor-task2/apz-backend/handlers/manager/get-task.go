@@ -8,11 +8,8 @@ import (
 	"github.com/go-chi/render"
 	"log/slog"
 	"net/http"
+	"strconv"
 )
-
-type GetTaskRequestData struct {
-	TaskID uint `json:"taskID"`
-}
 
 func GetTask(logger *slog.Logger, storage task.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -21,20 +18,20 @@ func GetTask(logger *slog.Logger, storage task.Storage) http.HandlerFunc {
 			slog.String("requestId", middleware.GetReqID(r.Context())),
 		)
 
-		var requestBody GetTaskRequestData
-		err := render.DecodeJSON(r.Body, &requestBody)
+		taskIDStr := r.PathValue("taskID")
+		taskID, err := strconv.ParseUint(taskIDStr, 10, 64)
 		if err != nil {
 			w.WriteHeader(400)
 			render.JSON(w, r, types.Response[any]{
 				Status: false,
-				Error:  "invalid request body",
+				Error:  "invalid request id",
 				Body:   nil,
 			})
-			l.Debug("err in decoding json")
+			l.Debug("invalid request id")
 			return
 		}
 
-		taskModel, err := task.Get(requestBody.TaskID,
+		taskModel, err := task.Get(uint(taskID),
 			task.Configuration{
 				Logger:  l,
 				Storage: storage,

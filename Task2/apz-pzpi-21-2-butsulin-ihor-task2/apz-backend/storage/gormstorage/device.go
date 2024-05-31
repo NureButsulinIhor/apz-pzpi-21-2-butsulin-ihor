@@ -18,7 +18,7 @@ func (g GormStorage) GetDevice(id uuid.UUID) (*models.Device, error) {
 	db := g.db
 
 	var device models.Device
-	result := db.Preload(clause.Associations).First(&device, id)
+	result := db.Model(&models.Device{}).Preload(clause.Associations).First(&device, id)
 
 	return &device, result.Error
 }
@@ -26,9 +26,9 @@ func (g GormStorage) GetDevice(id uuid.UUID) (*models.Device, error) {
 func (g GormStorage) ConnectDevice(deviceID uuid.UUID, slotID uint) error {
 	db := g.db
 
-	result := db.Model(&models.Device{}).Updates(models.Device{
+	result := db.Model(&models.Device{ID: deviceID}).Updates(models.Device{
 		ID:     deviceID,
-		SlotID: &slotID,
+		SlotID: slotID,
 	})
 
 	return result.Error

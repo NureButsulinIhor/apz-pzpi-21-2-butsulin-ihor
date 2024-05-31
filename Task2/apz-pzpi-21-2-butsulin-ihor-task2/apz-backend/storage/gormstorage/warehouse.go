@@ -25,10 +25,25 @@ func (g GormStorage) GetWarehouseBySlotID(id uint) (*models.Warehouse, error) {
 	var warehouse models.Warehouse
 	result := db.Model(&models.Warehouse{}).
 		Preload(clause.Associations).
+		Preload("Storage." + clause.Associations).
+		Preload("Storage.Slots." + clause.Associations).
+		Preload("Manager." + clause.Associations).
+		Preload("Workers." + clause.Associations).
 		Where(&models.Warehouse{StorageID: slot.StorageID}).
 		First(&warehouse)
 
 	return &warehouse, result.Error
+}
+
+func (g GormStorage) GetWarehouses() ([]models.Warehouse, error) {
+	db := g.db
+
+	var warehouses []models.Warehouse
+	result := db.Model(&models.Warehouse{}).
+		Preload(clause.Associations).
+		Find(&warehouses)
+
+	return warehouses, result.Error
 }
 
 func (g GormStorage) GetWarehouse(id uint) (*models.Warehouse, error) {
@@ -36,7 +51,12 @@ func (g GormStorage) GetWarehouse(id uint) (*models.Warehouse, error) {
 
 	var warehouse models.Warehouse
 	result := db.Model(&models.Warehouse{}).
-		Preload(clause.Associations).First(&warehouse, id)
+		Preload(clause.Associations).
+		Preload("Storage."+clause.Associations).
+		Preload("Storage.Slots."+clause.Associations).
+		Preload("Manager."+clause.Associations).
+		Preload("Workers."+clause.Associations).
+		First(&warehouse, id)
 
 	return &warehouse, result.Error
 }

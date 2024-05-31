@@ -1,24 +1,19 @@
-package car
+package warehouse
 
 import (
 	"apz-backend/types/models"
 	"errors"
 	"github.com/go-chi/jwtauth/v5"
 	"log/slog"
-	"time"
 )
-
-type TransfersByCarGetter interface {
-	GetTransfersByWarehouseID(warehouseID uint) ([]models.Transfer, error)
-}
 
 type ManagerGetter interface {
 	GetManagerByUserID(id uint) (*models.Manager, error)
 }
 
-func GetAll(cfg Configuration) ([]models.Car, error) {
+func GetForManager(cfg Configuration) (*models.Warehouse, error) {
 	l := cfg.Logger.With(
-		slog.String("op", "services.car.GetAll"),
+		slog.String("op", "services.warehouse.GetForManager"),
 	)
 
 	l.Debug("processing auth data")
@@ -28,7 +23,6 @@ func GetAll(cfg Configuration) ([]models.Car, error) {
 		return nil, errors.New("invalid JWT token")
 	}
 
-	l.Debug("processing claims")
 	user, err := models.NewUserFromClaims(payload)
 	if err != nil {
 		l.Debug("err to parse claims")
@@ -47,19 +41,11 @@ func GetAll(cfg Configuration) ([]models.Car, error) {
 		return nil, errors.New("no manager found")
 	}
 
-	l.Debug("getting transfers from db")
-	transfers, err := cfg.Storage.GetTransfersByWarehouseID(manager.WarehouseID)
+	warehouse, err := cfg.Storage.GetWarehouse(manager.WarehouseID)
 	if err != nil {
-		l.Error("err to get transfers from db", slog.String("error", err.Error()))
-		return nil, errors.New("internal error")
+		l.Debug("err to get warehouse from db")
+		return nil, errors.New("no warehouse found")
 	}
 
-	var actualCars []models.Car
-	for _, transfer := range transfers {
-		if transfer.InDate.Before(time.Now()) && transfer.OutDate.After(time.Now()) {
-			actualCars = append(actualCars, transfer.Car)
-		}
-	}
-
-	return actualCars, nil
+	return warehouse, nil
 }

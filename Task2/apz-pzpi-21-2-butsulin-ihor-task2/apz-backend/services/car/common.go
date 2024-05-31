@@ -13,6 +13,7 @@ type Storage interface {
 	Getter
 	TransfersByCarGetter
 	ManagerGetter
+	CarsGetter
 }
 
 type Configuration struct {

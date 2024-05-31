@@ -6,12 +6,14 @@ import (
 )
 
 type Storage interface {
+	ManagerGetter
 	StorageAdder
 	Adder
 	UserGetter
 	ManagerAdder
 	Deleter
 	Getter
+	WarehousesGetter
 }
 
 type Configuration struct {

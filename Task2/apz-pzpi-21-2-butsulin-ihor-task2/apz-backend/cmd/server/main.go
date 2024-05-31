@@ -12,6 +12,7 @@ import (
 	"apz-backend/storage/gormstorage"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/go-chi/jwtauth/v5"
 	"log/slog"
 	"net/http"
@@ -45,6 +46,14 @@ func main() {
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Timeout(60 * time.Second))
+	r.Use(cors.Handler(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-CSRF-Token"},
+		ExposedHeaders:   []string{"Link"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	}))
 
 	// Routes
 	// Without auth
@@ -71,9 +80,7 @@ func main() {
 			r.Post("/", register.Worker(logger, tokenAuth, storage))
 			r.Delete("/", register.DeleteWorker(logger, tokenAuth, storage))
 		})
-
 	})
-
 	r.Route("/admin", func(r chi.Router) {
 		r.Use(jwtauth.Verifier(tokenAuth))
 		r.Use(jwtauth.Authenticator(tokenAuth))
@@ -81,7 +88,8 @@ func main() {
 		r.Route("/car", func(r chi.Router) {
 			r.Post("/", admin.AddCar(logger, storage))
 			r.Delete("/", admin.DeleteCar(logger, storage))
-			r.Get("/", admin.GetCar(logger, storage))
+			r.Get("/{carID}", admin.GetCar(logger, storage))
+			r.Get("/all", admin.GetCars(logger, storage))
 		})
 
 		r.Route("/item", func(r chi.Router) {
@@ -92,13 +100,14 @@ func main() {
 		r.Route("/warehouse", func(r chi.Router) {
 			r.Post("/", admin.AddWarehouse(logger, storage))
 			r.Delete("/", admin.DeleteWarehouse(logger, storage))
-			r.Get("/", admin.GetWarehouse(logger, storage))
+			r.Get("/{warehouseID}", admin.GetWarehouse(logger, storage))
+			r.Get("/all", admin.GetWarehouses(logger, storage))
 		})
 
 		r.Route("/slot", func(r chi.Router) {
 			r.Post("/", admin.AddSlot(logger, storage))
 			r.Delete("/", admin.DeleteSlot(logger, storage))
-			r.Get("/", admin.GetSlot(logger, storage))
+			r.Get("/{slotID}", admin.GetSlot(logger, storage))
 			r.Put("/", admin.UpdateSlot(logger, storage))
 		})
 	})
@@ -114,7 +123,7 @@ func main() {
 
 		r.Route("/task", func(r chi.Router) {
 			r.Post("/", manager.AddTask(logger, storage))
-			r.Get("/", manager.GetTask(logger, storage))
+			r.Get("/{taskID}", manager.GetTask(logger, storage))
 			r.Get("/all", manager.GetTasks(logger, storage))
 			r.Delete("/", manager.DeleteTask(logger, storage))
 		})
@@ -125,11 +134,11 @@ func main() {
 
 		r.Route("/transfer", func(r chi.Router) {
 			r.Post("/", manager.AddTransfer(logger, storage))
-			r.Get("/all", manager.GetTransfers(logger, storage))
+			r.Get("/all/{carID}", manager.GetTransfers(logger, storage))
 		})
 
-		r.Route("/connect", func(r chi.Router) {
-			r.Post("/", manager.ConnectDevice(logger, storage))
+		r.Route("/warehouse", func(r chi.Router) {
+			r.Get("/", manager.GetWarehouse(logger, storage))
 		})
 	})
 

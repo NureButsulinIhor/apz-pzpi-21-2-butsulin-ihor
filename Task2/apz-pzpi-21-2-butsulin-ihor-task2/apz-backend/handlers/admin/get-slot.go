@@ -8,11 +8,8 @@ import (
 	"github.com/go-chi/render"
 	"log/slog"
 	"net/http"
+	"strconv"
 )
-
-type GetSlotRequestData struct {
-	SlotID uint `json:"slotID"`
-}
 
 func GetSlot(logger *slog.Logger, storage slot.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -21,20 +18,20 @@ func GetSlot(logger *slog.Logger, storage slot.Storage) http.HandlerFunc {
 			slog.String("requestId", middleware.GetReqID(r.Context())),
 		)
 
-		var requestBody GetSlotRequestData
-		err := render.DecodeJSON(r.Body, &requestBody)
+		slotIDStr := r.PathValue("slotID")
+		slotID, err := strconv.ParseUint(slotIDStr, 10, 64)
 		if err != nil {
 			w.WriteHeader(400)
 			render.JSON(w, r, types.Response[any]{
 				Status: false,
-				Error:  "invalid request body",
+				Error:  "invalid request id",
 				Body:   nil,
 			})
-			l.Debug("err in decoding json")
+			l.Debug("invalid request id")
 			return
 		}
 
-		slotModel, err := slot.Get(requestBody.SlotID,
+		slotModel, err := slot.Get(uint(slotID),
 			slot.Configuration{
 				Logger:  l,
 				Storage: storage,

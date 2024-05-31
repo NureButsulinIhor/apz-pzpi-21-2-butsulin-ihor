@@ -10,7 +10,6 @@ type Storage interface {
 	WeighingResultSetter
 	ManagerGetter
 	WarehouseGetter
-	Connector
 	SlotGetter
 }
 

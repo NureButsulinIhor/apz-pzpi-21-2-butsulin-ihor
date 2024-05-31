@@ -12,7 +12,7 @@ type DeviceAdder interface {
 	AddDevice(device *models.Device) error
 }
 
-func RegisterDevice(cfg Configuration) (string, error) {
+func RegisterDevice(slotID uint, cfg Configuration) (string, error) {
 	l := cfg.Logger.With(
 		slog.String("op", "services.registration.RegisterDevice"),
 	)
@@ -38,7 +38,8 @@ func RegisterDevice(cfg Configuration) (string, error) {
 
 	l.Debug("creating new device")
 	device := &models.Device{
-		ID: uuid.New(),
+		ID:     uuid.New(),
+		SlotID: slotID,
 	}
 	err = cfg.Storage.AddDevice(device)
 	if err != nil {

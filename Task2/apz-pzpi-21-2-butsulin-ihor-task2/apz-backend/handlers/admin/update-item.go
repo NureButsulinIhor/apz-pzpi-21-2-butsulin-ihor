@@ -10,9 +10,10 @@ import (
 )
 
 type UpdateItemRequestData struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	ItemID      uint   `json:"itemID"`
+	Name        string  `json:"name"`
+	Description string  `json:"description"`
+	Weight      float64 `json:"weight"`
+	ItemID      uint    `json:"itemID"`
 }
 
 func UpdateItem(logger *slog.Logger, storage item.Storage) http.HandlerFunc {
@@ -35,7 +36,7 @@ func UpdateItem(logger *slog.Logger, storage item.Storage) http.HandlerFunc {
 			return
 		}
 
-		err = item.Update(requestBody.ItemID, requestBody.Name, requestBody.Description,
+		err = item.Update(requestBody.ItemID, requestBody.Name, requestBody.Description, requestBody.Weight,
 			item.Configuration{
 				Logger:  l,
 				Storage: storage,

@@ -8,14 +8,14 @@ import (
 )
 
 type Updater interface {
-	UpdateItem(itemID uint, name, description string) error
+	UpdateItem(itemID uint, name, description string, weight float64) error
 }
 
 type Getter interface {
 	GetItem(id uint) (*models.Item, error)
 }
 
-func Update(itemID uint, name, description string, cfg Configuration) error {
+func Update(itemID uint, name, description string, weight float64, cfg Configuration) error {
 	l := cfg.Logger.With(
 		slog.String("op", "services.slot.Update"),
 	)
@@ -51,7 +51,7 @@ func Update(itemID uint, name, description string, cfg Configuration) error {
 	}
 
 	l.Debug("updating item in db")
-	err = cfg.Storage.UpdateItem(itemID, name, description)
+	err = cfg.Storage.UpdateItem(itemID, name, description, weight)
 	if err != nil {
 		l.Error("err to update item from db")
 		return errors.New("internal error")

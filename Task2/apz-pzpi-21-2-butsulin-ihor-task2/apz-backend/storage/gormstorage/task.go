@@ -63,7 +63,7 @@ func (g GormStorage) GetTasksByToSlotID(slotID uint) ([]models.Task, error) {
 func (g GormStorage) UpdateTask(task *models.Task) error {
 	db := g.db
 
-	result := db.Model(&models.Task{}).Updates(models.Task{
+	result := db.Model(&models.Task{Model: gorm.Model{ID: task.ID}}).Updates(models.Task{
 		Model:      gorm.Model{ID: task.ID},
 		WorkerID:   task.WorkerID,
 		FromSlotID: task.FromSlotID,

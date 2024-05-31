@@ -26,7 +26,23 @@ func (g GormStorage) GetCar(carID uint) (*models.Car, error) {
 	db := g.db
 
 	var car models.Car
-	result := db.Preload(clause.Associations).First(&car, carID)
+	result := db.Model(&models.Car{}).
+		Preload(clause.Associations).
+		Preload("Storage."+clause.Associations).
+		Preload("Storage.Slots."+clause.Associations).
+		Preload("Owner."+clause.Associations).
+		First(&car, carID)
 
 	return &car, result.Error
+}
+
+func (g GormStorage) GetCars() ([]models.Car, error) {
+	db := g.db
+
+	var cars []models.Car
+	result := db.Model(&models.Car{}).
+		Preload(clause.Associations).
+		Find(&cars)
+
+	return cars, result.Error
 }

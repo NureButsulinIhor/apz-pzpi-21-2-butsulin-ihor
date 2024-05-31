@@ -10,6 +10,10 @@ import (
 	"net/http"
 )
 
+type DeviceRequestBody struct {
+	SlotID uint `json:"slotID"`
+}
+
 type Response struct {
 	JWT string `json:"jwt"`
 }
@@ -21,7 +25,20 @@ func Device(logger *slog.Logger, jwtAuth *jwtauth.JWTAuth, storage registration.
 			slog.String("requestId", middleware.GetReqID(r.Context())),
 		)
 
-		outputJWT, err := registration.RegisterDevice(registration.Configuration{
+		var requestBody DeviceRequestBody
+		err := render.DecodeJSON(r.Body, &requestBody)
+		if err != nil {
+			w.WriteHeader(400)
+			render.JSON(w, r, types.Response[any]{
+				Status: false,
+				Error:  "invalid request body",
+				Body:   nil,
+			})
+			l.Debug("err in decoding json")
+			return
+		}
+
+		outputJWT, err := registration.RegisterDevice(requestBody.SlotID, registration.Configuration{
 			Logger:  l,
 			Storage: storage,
 			Context: r.Context(),
