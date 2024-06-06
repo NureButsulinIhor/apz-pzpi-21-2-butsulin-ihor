@@ -19,6 +19,7 @@ func (g GormStorage) GetTransfersByWarehouseID(warehouseID uint) ([]models.Trans
 	var transfers []models.Transfer
 	result := db.Model(&models.Transfer{}).
 		Preload(clause.Associations).
+		Preload("Car." + clause.Associations).
 		Where(&models.Transfer{WarehouseID: warehouseID}).
 		Find(&transfers)
 

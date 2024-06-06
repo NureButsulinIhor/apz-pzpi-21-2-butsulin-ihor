@@ -30,7 +30,7 @@ func GetAllForAdmin(cfg Configuration) ([]models.Car, error) {
 		return nil, errors.New("invalid claims")
 	}
 
-	if user.Type != models.AdminType {
+	if user.Type != models.AdminType && user.Type != models.ManagerType {
 		l.Debug("user is not admin")
 		return nil, errors.New("user is not admin")
 	}

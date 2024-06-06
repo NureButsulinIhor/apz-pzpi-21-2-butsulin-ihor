@@ -59,7 +59,7 @@ func Add(name, description string, weight float64, slotID uint, cfg Configuratio
 		Name:        name,
 		Description: description,
 		Weight:      weight,
-		SlotID:      &slotID,
+		SlotID:      slotID,
 	}
 	err = cfg.Storage.AddItem(item)
 	if err != nil {

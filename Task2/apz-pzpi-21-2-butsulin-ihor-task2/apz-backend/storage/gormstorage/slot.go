@@ -37,7 +37,6 @@ func (g GormStorage) UpdateSlot(slot *models.Slot) error {
 	result := db.Model(&models.Slot{Model: gorm.Model{ID: slot.ID}}).Updates(models.Slot{
 		Model:     gorm.Model{ID: slot.ID},
 		MaxWeight: slot.MaxWeight,
-		ItemID:    slot.ItemID,
 	})
 
 	return result.Error
