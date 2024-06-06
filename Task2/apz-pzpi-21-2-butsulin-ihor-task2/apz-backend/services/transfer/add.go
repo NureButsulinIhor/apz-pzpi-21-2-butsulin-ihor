@@ -20,7 +20,7 @@ type Adder interface {
 	AddTransfer(transfer models.Transfer) error
 }
 
-func Add(inDate, outDate time.Time, carID uint, cfg Configuration) error {
+func Add(outDate time.Time, carID uint, cfg Configuration) error {
 	l := cfg.Logger.With(
 		slog.String("op", "services.transfer.Add"),
 	)
@@ -57,7 +57,9 @@ func Add(inDate, outDate time.Time, carID uint, cfg Configuration) error {
 		return errors.New("internal error")
 	}
 
-	if inDate.After(outDate) || inDate.Equal(outDate) || inDate.Before(time.Now()) {
+	inDate := time.Now()
+
+	if inDate.After(outDate) || inDate.Equal(outDate) {
 		l.Debug("inDate must be before outDate")
 		return errors.New("inDate must be before outDate")
 	}

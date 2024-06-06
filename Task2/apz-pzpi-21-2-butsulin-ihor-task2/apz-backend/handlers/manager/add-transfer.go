@@ -11,7 +11,6 @@ import (
 )
 
 type AddTransferRequestData struct {
-	InTime  time.Time `json:"inTime"`
 	OutTime time.Time `json:"outTime"`
 	CarID   uint      `json:"carID"`
 }
@@ -36,7 +35,7 @@ func AddTransfer(logger *slog.Logger, storage transfer.Storage) http.HandlerFunc
 			return
 		}
 
-		err = transfer.Add(requestBody.InTime, requestBody.OutTime, requestBody.CarID,
+		err = transfer.Add(requestBody.OutTime, requestBody.CarID,
 			transfer.Configuration{
 				Logger:  l,
 				Storage: storage,

@@ -74,11 +74,11 @@ func AddToTimetable(workerID uint, startWorkShift time.Duration, endWorkShift ti
 	timetable := models.Timetable{
 		WorkerID:  workerID,
 		StartTime: today.Add(startWorkShift),
-		EndTime:   today.Add(startWorkShift),
+		EndTime:   today.Add(endWorkShift),
 	}
 	err = cfg.Storage.AddTimetable(timetable)
 	if err != nil {
-		l.Error("err to connect device", slog.String("error", err.Error()))
+		l.Error("err to add timetable", slog.String("error", err.Error()))
 		return errors.New("internal error")
 	}
 

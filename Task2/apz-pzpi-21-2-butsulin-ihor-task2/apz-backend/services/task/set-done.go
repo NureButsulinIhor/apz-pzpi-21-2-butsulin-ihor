@@ -16,7 +16,7 @@ type Updater interface {
 }
 
 type SlotUpdater interface {
-	UpdateSlot(slot *models.Slot) error
+	UpdateItemSlot(itemID uint, slotID uint) error
 }
 
 func SetDone(taskID uint, cfg Configuration) error {
@@ -73,14 +73,11 @@ func SetDone(taskID uint, cfg Configuration) error {
 		return errors.New("internal error")
 	}
 
-	toSlot.ItemID = fromSlot.ItemID
-	fromSlot.ItemID = nil
-	err = cfg.Storage.UpdateSlot(fromSlot)
-	if err != nil {
-		l.Error("err to update slot", slog.String("error", err.Error()))
-		return errors.New("internal error")
+	if fromSlot.Item == nil {
+		l.Debug("item is not in slot")
+		return errors.New("item is not in slot")
 	}
-	err = cfg.Storage.UpdateSlot(toSlot)
+	err = cfg.Storage.UpdateItemSlot(fromSlot.Item.ID, toSlot.ID)
 	if err != nil {
 		l.Error("err to update slot", slog.String("error", err.Error()))
 		return errors.New("internal error")

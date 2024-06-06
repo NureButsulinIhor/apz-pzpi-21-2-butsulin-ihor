@@ -35,3 +35,13 @@ func (g GormStorage) UpdateItem(itemID uint, name, description string, weight fl
 
 	return result.Error
 }
+
+func (g GormStorage) UpdateItemSlot(itemID uint, slotID uint) error {
+	db := g.db
+
+	result := db.Model(&models.Item{Model: gorm.Model{ID: itemID}}).Updates(models.Item{
+		SlotID: slotID,
+	})
+
+	return result.Error
+}

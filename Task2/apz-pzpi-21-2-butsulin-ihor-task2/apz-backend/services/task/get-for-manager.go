@@ -59,7 +59,7 @@ func GetForManager(cfg Configuration) ([]models.Task, error) {
 
 	if len(tasks) == 0 {
 		l.Debug("no tasks found")
-		return nil, errors.New("no tasks found")
+		return nil, nil
 	}
 
 	return tasks, nil

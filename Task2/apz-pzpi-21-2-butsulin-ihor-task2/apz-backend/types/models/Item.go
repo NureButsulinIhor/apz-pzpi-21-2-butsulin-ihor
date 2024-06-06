@@ -7,5 +7,5 @@ type Item struct {
 	Name        string  `json:"name"`
 	Description string  `json:"description"`
 	Weight      float64 `json:"weight"`
-	SlotID      *uint   `json:"slotID"`
+	SlotID      uint    `json:"slotID"`
 }

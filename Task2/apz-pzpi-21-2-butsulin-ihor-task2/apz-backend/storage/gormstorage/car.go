@@ -42,6 +42,7 @@ func (g GormStorage) GetCars() ([]models.Car, error) {
 	var cars []models.Car
 	result := db.Model(&models.Car{}).
 		Preload(clause.Associations).
+		Preload("Owner." + clause.Associations).
 		Find(&cars)
 
 	return cars, result.Error
